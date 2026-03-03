@@ -110,7 +110,7 @@ apps:
           default_logger_name: default
         errors:
           routes:
-            # Redirect 502 at / to /meet (Meet handles all app traffic)
+            # Redirect 502 at / to /meet (no custom app deployed at port 6080)
             - match:
                 - expression: '{http.error.status_code} == 502'
                   path:
@@ -261,16 +261,16 @@ apps:
                 upstreams:
                   - dial: "openvidu-meet:9080"
 
-          # Default: redirect /* to /meet/
+          # Custom User Application at port 6080
+          # If an app is deployed at port 6080, it will be served at /*
+          # If no app is deployed, requests to / will return 502 and be redirected to /meet/
           - match:
               - path:
                   - /*
             handle:
-              - handler: static_response
-                status_code: 302
-                headers:
-                  Location:
-                    - /meet/
+              - handler: reverse_proxy
+                upstreams:
+                  - dial: "host.docker.internal:6080"
 
       minio:
         listen:
