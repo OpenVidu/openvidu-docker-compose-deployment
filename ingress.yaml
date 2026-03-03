@@ -15,4 +15,4 @@ logging:
     level: ""
 development: false
 rtc_config:
-    udp_port: 7895
+    udp_port: 7885

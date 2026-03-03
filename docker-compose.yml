@@ -139,7 +139,7 @@ services:
       - host.docker.internal:host-gateway
     ports:
       - 8085:8085
-      - 7895:7895/udp
+      - 7885:7885/udp
     environment:
       - INGRESS_CONFIG_FILE=/etc/ingress.yaml
       - REDIS_PASSWORD=${REDIS_PASSWORD:?mandatory}
