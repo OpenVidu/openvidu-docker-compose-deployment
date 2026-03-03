@@ -1,0 +1,300 @@
+admin:
+  disabled: true
+
+storage:
+  module: file_system
+  root: /data
+
+apps:
+  # ----
+  # Own certificate (Custom certificate) example (uncomment if you want to use your own certs instead of Let's Encrypt)
+  # tls:
+  #   certificates:
+  #     load_files:
+  #       - certificate: "/owncert/fullchain.pem"
+  #         key: "/owncert/privkey.pem"
+  #         tags:
+  #           - "{$DOMAIN_NAME}"
+  # ----
+  # Self-signed certificate example (uncomment if you want to use self-signed certs, not recommended for production)
+  # tls:
+  #   certificates:
+  #     automate:
+  #       - "{$DOMAIN_NAME}"
+  #     automation:
+  #       policies:
+  #         - issuers:
+  #             - module: internal
+  # ----
+  # Default: Let's Encrypt with ACME
+  tls:
+    certificates:
+      automate:
+        - "{$DOMAIN_NAME}"
+    automation:
+      policies:
+        - issuers:
+            - module: acme
+
+  layer4:
+    servers:
+      public:
+        listen:
+          - ":443"
+        routes:
+          # TLS handling. It resends to the same port to handle TURN and HTTP traffic
+          - handle:
+              - handler: tls
+                connection_policies:
+                  - alpn:
+                      - http/1.1
+              - handler: proxy
+                upstreams:
+                  - dial:
+                      - 127.0.0.1:7881
+
+      # RTMP Ingress
+      rtmp:
+        listen:
+          - ":1935"
+        routes:
+          - handle:
+              - handler: tls
+              - handler: proxy
+                upstreams:
+                  - dial:
+                      - ingress:1935
+
+      # TCP demuxer for TURN and HTTP traffic
+      tcp-demux:
+        listen:
+          - ":7881"
+        routes:
+          - match:
+              - regexp:
+                  count: 6
+                  pattern: "^[\x00-\x3F][\x00-\xFF][\x00-\xFF][\x00-\xFF]\x21\x12$"
+            handle:
+              - handler: proxy
+                upstreams:
+                  - dial:
+                      # TURN with TLS in Firefox does not allow 127.0.0.1
+                      # Using Docker service name instead of docker0 interface IP
+                      - openvidu:5349
+          - handle:
+              - handler: proxy
+                upstreams:
+                  - dial:
+                      - 127.0.0.1:7880
+
+  http:
+    http_port: 80
+    https_port: 443
+    servers:
+      # Redirect HTTP to HTTPS
+      redirect:
+        listen:
+          - ":80"
+        routes:
+          - handle:
+              - handler: static_response
+                status_code: 301
+                headers:
+                  Location:
+                    - "https://{http.request.host}{http.request.uri}"
+
+      public:
+        listen:
+          - ":7880"
+        logs:
+          default_logger_name: default
+        errors:
+          routes:
+            # Redirect 502 at / to /meet (Meet handles all app traffic)
+            - match:
+                - expression: '{http.error.status_code} == 502'
+                  path:
+                    - /
+              handle:
+                - handler: static_response
+                  status_code: 302
+                  headers:
+                    Location:
+                      - /meet{http.request.uri}
+        routes:
+          - handle:
+              - handler: subroute
+                routes:
+                  - handle:
+                      - handler: reverse_proxy
+                        health_checks:
+                          active:
+                            expect_status: 200
+                            interval: 5s
+                            timeout: 2s
+                            uri: "/"
+                        load_balancing:
+                          retries: 2
+                          selection_policy:
+                            policy: round_robin
+                        upstreams:
+                          - dial: openvidu:7880
+                    match:
+                      - path:
+                          - "/twirp/*"
+                          - "/rtc/*"
+                          - "/rtc"
+                          - "/agent/*"
+                          - "/agent"
+
+          # Custom layouts.
+          # Place layouts in ./custom-layout to serve at https://<domain>/openvidu/layouts
+          - handle:
+              - handler: subroute
+                routes:
+                  - handle:
+                      - handler: rewrite
+                        strip_path_prefix: /openvidu/layouts
+                      - handler: file_server
+                        root: /var/www/custom-layout
+                    match:
+                      - path:
+                          - /openvidu/layouts
+                          - /openvidu/layouts/*
+
+          # Ingress WHIP service
+          - handle:
+              - handler: subroute
+                routes:
+                  - handle:
+                      - handler: reverse_proxy
+                        health_checks:
+                          active:
+                            expect_status: 404
+                            interval: 5s
+                            timeout: 2s
+                            uri: /
+                        load_balancing:
+                          retries: 2
+                          selection_policy:
+                            policy: round_robin
+                        upstreams:
+                          - dial: "ingress:8085"
+                    match:
+                      - path:
+                          - /whip
+
+          # Dashboard
+          - handle:
+              - handler: subroute
+                routes:
+                  - handle:
+                      - handler: rewrite
+                        strip_path_prefix: /dashboard
+                      - handler: reverse_proxy
+                        upstreams:
+                          - dial: "dashboard:5000"
+                    match:
+                      - path:
+                          - /dashboard/*
+                          - /dashboard
+
+          # Health check caddy
+          - handle:
+              - handler: subroute
+                routes:
+                  - handle:
+                      - handler: static_response
+                        status_code: 200
+                        body: "OK"
+                    match:
+                      - path:
+                          - /health/caddy
+
+          # Minio Console
+          - handle:
+              - handler: subroute
+                routes:
+                  - handle:
+                      - handler: static_response
+                        headers:
+                          Location:
+                            - "/minio-console/"
+                        status_code: 302
+                    match:
+                      - path:
+                          - /minio-console
+
+          - handle:
+              - handler: subroute
+                routes:
+                  - handle:
+                      - handler: rewrite
+                        strip_path_prefix: /minio-console
+                      - handler: reverse_proxy
+                        upstreams:
+                          - dial: "minio:9001"
+                    match:
+                      - path:
+                          - /minio-console/*
+
+          # Grafana
+          - handle:
+              - handler: subroute
+                routes:
+                  - handle:
+                      - handler: reverse_proxy
+                        upstreams:
+                          - dial: "grafana:3000"
+                    match:
+                      - path:
+                          - /grafana/*
+                          - /grafana
+
+          # OpenVidu Meet at /meet/*
+          - match:
+              - path:
+                  - /meet
+                  - /meet/*
+            handle:
+              - handler: reverse_proxy
+                upstreams:
+                  - dial: "openvidu-meet:6080"
+
+          # Default: redirect /* to /meet/
+          - match:
+              - path:
+                  - /*
+            handle:
+              - handler: static_response
+                status_code: 302
+                headers:
+                  Location:
+                    - /meet/
+
+      minio:
+        listen:
+          - ":9000"
+        logs:
+          default_logger_name: default
+        automatic_https:
+          disable_redirects: true
+        routes:
+          - handle:
+              - handler: reverse_proxy
+                health_checks:
+                  active:
+                    expect_status: 200
+                    interval: 5s
+                    timeout: 2s
+                    uri: "/minio/health/live"
+                upstreams:
+                  - dial: "minio:9000"
+            match:
+              - host:
+                  - "{$DOMAIN_NAME}"
+
+logging:
+  logs:
+    default:
+      level: WARN

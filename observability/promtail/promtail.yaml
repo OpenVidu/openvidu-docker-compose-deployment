@@ -1,0 +1,39 @@
+server:
+  disable: true
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  - job_name: openvidu_cluster_logs
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+        refresh_interval: 5s
+        filters:
+          - name: label
+            values: ["logging=true"]
+    relabel_configs:
+      - source_labels: ["__meta_docker_container_name"]
+        regex: "/(.*)"
+        target_label: container
+    pipeline_stages:
+      - match:
+          selector: '{container=~".+"} |~ "(?i)warn"'
+          stages:
+            - static_labels:
+                level: warning
+      - match:
+          selector: '{container=~".+"} |~ "(?i)error"'
+          stages:
+            - static_labels:
+                level: error
+      - match:
+          selector: '{container="openvidu"}'
+          stages:
+            - regex:
+                expression: '"(?P<room_id>RM_\w+)"'
+            - labels:
+                room_id:

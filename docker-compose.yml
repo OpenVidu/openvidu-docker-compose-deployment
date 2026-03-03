@@ -1,0 +1,272 @@
+services:
+  caddy-proxy:
+    build:
+      context: ./docker/caddy-proxy
+      dockerfile: Dockerfile
+    image: caddy-layer4
+    container_name: caddy-proxy
+    restart: unless-stopped
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    environment:
+      - DOMAIN_NAME=${DOMAIN_NAME:?mandatory}
+    volumes:
+      - ./caddy.yaml:/etc/caddy/caddy.yaml
+      - ./custom-layout:/var/www/custom-layout
+      - ./owncert/:/owncert/
+      - caddy-data:/data
+      - caddy-config:/config
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 80:80
+      - 443:443
+      - 1935:1935
+      - 9000:9000
+    networks:
+      - openvidu-network
+    labels:
+      - logging=true
+
+  redis:
+    image: docker.io/redis:8.6.1-alpine
+    container_name: redis
+    restart: unless-stopped
+    command: redis-server --requirepass ${REDIS_PASSWORD:?mandatory}
+    volumes:
+      - redis-data:/data
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - openvidu-network
+    labels:
+      - logging=true
+
+  minio:
+    image: docker.io/openvidu/minio:2025.10.15-debian-12-r9
+    container_name: minio
+    restart: unless-stopped
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ACCESS_KEY:?mandatory}
+      - MINIO_ROOT_PASSWORD=${MINIO_SECRET_KEY:?mandatory}
+      - MINIO_DEFAULT_BUCKETS=openvidu-appdata
+      - MINIO_CONSOLE_SUBPATH=/minio-console
+      - MINIO_BROWSER=on
+      - MINIO_BROWSER_REDIRECT_URL=http://localhost:7880/minio-console
+    volumes:
+      - minio-data:/bitnami/minio/data
+      - minio-certs:/certs
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - openvidu-network
+    labels:
+      - logging=true
+
+  mongo:
+    image: docker.io/openvidu/mongodb:8.0.19-r1
+    container_name: mongo
+    restart: unless-stopped
+    environment:
+      - MONGODB_ROOT_USER=${MONGO_ADMIN_USERNAME:?mandatory}
+      - MONGODB_ROOT_PASSWORD=${MONGO_ADMIN_PASSWORD:?mandatory}
+      - MONGODB_ADVERTISED_HOSTNAME=mongo
+      - MONGODB_REPLICA_SET_MODE=primary
+      - MONGODB_REPLICA_SET_NAME=rs0
+      - MONGODB_REPLICA_SET_KEY=devreplicasetkey
+    volumes:
+      - mongo-data:/bitnami/mongodb
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - openvidu-network
+    labels:
+      - logging=true
+
+  dashboard:
+    image: docker.io/openvidu/openvidu-dashboard:main
+    container_name: dashboard
+    restart: unless-stopped
+    environment:
+      - SERVER_PORT=5000
+      - ADMIN_USERNAME=${DASHBOARD_ADMIN_USERNAME:?mandatory}
+      - ADMIN_PASSWORD=${DASHBOARD_ADMIN_PASSWORD:?mandatory}
+      - DATABASE_URL=mongodb://${MONGO_ADMIN_USERNAME:?mandatory}:${MONGO_ADMIN_PASSWORD:?mandatory}@mongo:27017/?replicaSet=rs0&readPreference=primaryPreferred
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - openvidu-network
+    labels:
+      - logging=true
+
+  openvidu:
+    image: docker.io/openvidu/openvidu-server:main
+    restart: unless-stopped
+    container_name: openvidu
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD:?mandatory}
+      - LIVEKIT_TURN_DOMAIN=${DOMAIN_NAME:?mandatory}
+      - "LIVEKIT_KEYS=${LIVEKIT_API_KEY:?mandatory}: ${LIVEKIT_API_SECRET:?mandatory}"
+    ports:
+      - 443:443/udp
+      - 7881:7881/tcp
+    command: --config /etc/livekit.yaml
+    volumes:
+      - ./livekit.yaml:/etc/livekit.yaml
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - openvidu-network
+    labels:
+      - logging=true
+
+  ingress:
+    image: docker.io/openvidu/ingress:main
+    container_name: ingress
+    restart: unless-stopped
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    ports:
+      - 8085:8085
+      - 7895:7895/udp
+    environment:
+      - INGRESS_CONFIG_FILE=/etc/ingress.yaml
+      - REDIS_PASSWORD=${REDIS_PASSWORD:?mandatory}
+      - LIVEKIT_API_KEY=${LIVEKIT_API_KEY:?mandatory}
+      - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET:?mandatory}
+      - LIVEKIT_INGRESS_RTMP_BASE_URL=rtmp://${DOMAIN_NAME:?mandatory}/rtmp
+      - LIVEKIT_INGRESS_WHIP_BASE_URL=http://${DOMAIN_NAME:?mandatory}/whip
+    volumes:
+      - ./ingress.yaml:/etc/ingress.yaml
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - openvidu-network
+    labels:
+      - logging=true
+
+  egress:
+    image: docker.io/openvidu/egress:main
+    restart: unless-stopped
+    container_name: egress
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    environment:
+      - AWS_ACCESS_KEY_ID=${MINIO_ACCESS_KEY:?mandatory}
+      - AWS_SECRET_ACCESS_KEY=${MINIO_SECRET_KEY:?mandatory}
+      - REDIS_PASSWORD=${REDIS_PASSWORD:?mandatory}
+      - LIVEKIT_API_KEY=${LIVEKIT_API_KEY:?mandatory}
+      - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET:?mandatory}
+      - EGRESS_CONFIG_FILE=/etc/egress.yaml
+    volumes:
+      - ./egress.yaml:/etc/egress.yaml
+      - egress-data:/home/egress/tmp
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - openvidu-network
+    labels:
+      - logging=true
+
+  openvidu-meet:
+    image: docker.io/openvidu/openvidu-meet:main
+    container_name: openvidu-meet
+    restart: on-failure
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    environment:
+      - LIVEKIT_URL=wss://${DOMAIN_NAME:?mandatory}/
+      - LIVEKIT_API_KEY=${LIVEKIT_API_KEY:?mandatory}
+      - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET:?mandatory}
+      - MEET_INITIAL_ADMIN_USER=${MEET_INITIAL_ADMIN_USER:?mandatory}
+      - MEET_INITIAL_ADMIN_PASSWORD=${MEET_INITIAL_ADMIN_PASSWORD:?mandatory}
+      - MEET_INITIAL_API_KEY=${MEET_INITIAL_API_KEY:-}
+      - MEET_S3_ACCESS_KEY=${MINIO_ACCESS_KEY:?mandatory}
+      - MEET_S3_SECRET_KEY=${MINIO_SECRET_KEY:?mandatory}
+      - MEET_REDIS_PASSWORD=${REDIS_PASSWORD:?mandatory}
+      - MEET_MONGO_URI=mongodb://${MONGO_ADMIN_USERNAME:?mandatory}:${MONGO_ADMIN_PASSWORD:?mandatory}@mongo:27017/?replicaSet=rs0&readPreference=primaryPreferred
+      - MEET_BASE_URL=http://${DOMAIN_NAME:?mandatory}/
+      - MEET_BASE_PATH=${MEET_BASE_PATH:-/meet}
+      - MEET_CONFIG_DIR=/config/meet.env
+    volumes:
+      - ./meet.env:/config/meet.env
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - openvidu-network
+    labels:
+      - logging=true
+
+  # Observability stack
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: on-failure
+    depends_on:
+      - openvidu
+    command:
+      - --config.file=/config/prometheus.yaml
+      - --storage.tsdb.retention.time=32d
+    volumes:
+      - ./observability/prometheus/prometheus.yaml:/config/prometheus.yaml:ro
+      - prometheus-data:/prometheus
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - openvidu-network
+
+  loki:
+    image: grafana/loki:latest
+    container_name: loki
+    restart: on-failure
+    command: -config.file=/config/loki.yaml
+    volumes:
+      - ./observability/loki/loki.yaml:/config/loki.yaml:ro
+      - loki-data:/loki
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - openvidu-network
+
+  promtail:
+    image: grafana/promtail:latest
+    container_name: promtail
+    restart: on-failure
+    depends_on:
+      - loki
+    command: -config.file=/config/promtail.yaml
+    volumes:
+      - ./observability/promtail/promtail.yaml:/config/promtail.yaml:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - openvidu-network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: on-failure
+    depends_on:
+      - prometheus
+      - loki
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USERNAME:?mandatory}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:?mandatory}
+      - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/etc/grafana/provisioning/dashboards/openvidu_metrics.json
+      - GF_SERVER_ROOT_URL=https://${DOMAIN_NAME:?mandatory}/grafana/
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./observability/grafana/provisioning:/etc/grafana/provisioning
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - openvidu-network
+
+volumes:
+  caddy-data:
+  caddy-config:
+  redis-data:
+  minio-certs:
+  minio-data:
+  mongo-data:
+  egress-data:
+  prometheus-data:
+  loki-data:
+  grafana-data:
+
+networks:
+  openvidu-network:
+    name: openvidu-docker-compose

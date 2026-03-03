@@ -1,0 +1,45 @@
+# OpenVidu configuration
+openvidu:
+    analytics:
+        enabled: true
+        interval: 10s
+        expiration: 768h # 32 days
+        mongo_url: mongodb://mongoadmin:mongoadmin@mongo:27017/?replicaSet=rs0&readPreference=primaryPreferred
+
+# LiveKit configuration
+port: 7880
+prometheus_port: 6789
+bind_addresses:
+    - ""
+rtc:
+    port_range_start: 50000
+    port_range_end: 60000
+    use_external_ip: true
+redis:
+    address: redis:6379
+    username: ""
+    db: 0
+    use_tls: false
+    # Setted via environment variable in docker-compose.yml
+    # password:
+turn:
+    enabled: true
+    udp_port: 443
+    tls_port: 5349
+    external_tls: true
+    relay_range_start: 40000
+    relay_range_end: 50000
+webhook:
+    api_key: devkey
+    urls:
+        - http://openvidu-meet:6080/livekit/webhook
+logging:
+    # Logging level for the LiveKit server.
+    # Values: debug, info, warn, error.
+    # Default: info.
+    level: info
+
+    # Logging level for the Pion WebRTC engine.
+    # Values: trace, debug, info, warn, error.
+    # Default: error.
+    pion_level: warn

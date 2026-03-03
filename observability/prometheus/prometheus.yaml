@@ -1,0 +1,7 @@
+global:
+  scrape_interval: 10s
+
+scrape_configs:
+  - job_name: openvidu
+    static_configs:
+      - targets: ["openvidu:6789"]

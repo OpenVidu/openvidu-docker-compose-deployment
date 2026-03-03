@@ -1,0 +1,11 @@
+apiVersion: 1
+
+providers:
+  - name: Dashboard
+    folder: OpenVidu
+    folderUid: openvidu-dashboards
+    type: file
+    disableDeletion: false
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards
