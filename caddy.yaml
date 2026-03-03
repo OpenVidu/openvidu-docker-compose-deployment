@@ -1,3 +1,6 @@
+# Note: __DOMAIN_NAME__ is a placeholder replaced at container startup
+# by the entrypoint script using the DOMAIN_NAME environment variable.
+
 admin:
   disabled: true
 
@@ -14,13 +17,13 @@ apps:
   #       - certificate: "/owncert/fullchain.pem"
   #         key: "/owncert/privkey.pem"
   #         tags:
-  #           - "{$DOMAIN_NAME}"
+  #           - "__DOMAIN_NAME__"
   # ----
   # Self-signed certificate example (uncomment if you want to use self-signed certs, not recommended for production)
   # tls:
   #   certificates:
   #     automate:
-  #       - "{$DOMAIN_NAME}"
+  #       - "__DOMAIN_NAME__"
   #     automation:
   #       policies:
   #         - issuers:
@@ -30,7 +33,7 @@ apps:
   tls:
     certificates:
       automate:
-        - "{$DOMAIN_NAME}"
+        - "__DOMAIN_NAME__"
     automation:
       policies:
         - issuers:
@@ -292,7 +295,7 @@ apps:
                   - dial: "minio:9000"
             match:
               - host:
-                  - "{$DOMAIN_NAME}"
+                  - "__DOMAIN_NAME__"
 
 logging:
   logs:

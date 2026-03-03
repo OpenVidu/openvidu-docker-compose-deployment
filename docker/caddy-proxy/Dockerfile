@@ -53,6 +53,8 @@ ENV XDG_CONFIG_HOME=/config
 ENV XDG_DATA_HOME=/data
 
 COPY --from=builder /workspace/caddy /bin/caddy
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 EXPOSE 80
 EXPOSE 443
@@ -60,5 +62,4 @@ EXPOSE 443/udp
 
 WORKDIR /srv
 
-# Run the binary.
-CMD ["caddy", "run", "--config", "/etc/caddy/caddy.yaml", "--adapter", "yaml"]
+ENTRYPOINT ["/entrypoint.sh"]
