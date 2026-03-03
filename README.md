@@ -51,11 +51,7 @@ Outbound traffic is typically unrestricted and requires no special configuration
 
 ## Configuration
 
-Copy `.env.example` to `.env` and fill in the required values:
-
-```bash
-cp .env.example .env
-```
+Configure all the following environment variables in the `.env` file before starting the deployment. All are mandatory except `MEET_INITIAL_API_KEY` and `MEET_BASE_PATH`, which have defaults.
 
 **Mandatory variables**
 
@@ -79,7 +75,7 @@ cp .env.example .env
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `MEET_INITIAL_API_KEY` | _(empty)_ | Initial API key for OpenVidu Meet |
+| `MEET_INITIAL_API_KEY` | _(empty)_ | Initial API key for OpenVidu Meet. By default, no API key is set. |
 | `MEET_BASE_PATH` | `/meet` | Base path where OpenVidu Meet is served |
 
 ## Usage
