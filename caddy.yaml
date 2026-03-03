@@ -51,7 +51,7 @@ apps:
               - handler: proxy
                 upstreams:
                   - dial:
-                      - 127.0.0.1:7881
+                      - 127.0.0.1:5656
 
       # RTMP Ingress
       rtmp:
@@ -68,7 +68,7 @@ apps:
       # TCP demuxer for TURN and HTTP traffic
       tcp-demux:
         listen:
-          - ":7881"
+          - ":5656"
         routes:
           - match:
               - regexp:
