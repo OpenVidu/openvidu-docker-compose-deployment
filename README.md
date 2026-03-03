@@ -12,7 +12,7 @@ This is a less opinionated and production ready version of the **OpenVidu Commun
 
 - **CPU**: 4 cores minimum
 - **RAM**: 4 GB minimum
-- **Storage**: 100 GB recommended if you plan to record sessions
+- **Storage**: 100 GB recommended if you plan to record rooms
 - **Network**: Public IP address and a Fully Qualified Domain Name (FQDN) pointing to it
 - **OS**: Linux
 - **Software**: [Docker](https://docs.docker.com/engine/install/) and [Docker Compose](https://docs.docker.com/compose/install/) installed
