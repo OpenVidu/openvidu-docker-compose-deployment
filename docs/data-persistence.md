@@ -6,7 +6,7 @@ All stateful data is stored in standard Docker named volumes:
 |--------|---------|----------|
 | `caddy-data` | caddy-proxy | TLS certificates and ACME account data |
 | `caddy-config` | caddy-proxy | Caddy runtime configuration |
-| `redis-data` | redis | Session state |
+| `redis-data` | redis | LiveKit runtime state |
 | `minio-data` | minio | **Critical** — recordings produced by egress and application data |
 | `minio-certs` | minio | MinIO TLS certificates |
 | `mongo-data` | mongo | **Critical** — OpenVidu Meet data and all data shown in the Dashboard |
