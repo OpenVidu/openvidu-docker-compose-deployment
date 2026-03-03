@@ -101,6 +101,35 @@ Runs the `openvidu` container with `network_mode: host`, which can improve WebRT
 docker compose -f docker-compose.yml -f docker-compose.host.yaml up -d
 ```
 
+## Verifying the Deployment
+
+Check that all containers are running without restarts:
+
+```bash
+docker compose ps
+```
+
+If all services show as `running` with no recent restarts, the deployment is healthy. OpenVidu Meet will be available at:
+
+```
+https://DOMAIN_NAME/
+```
+
+Log in with the `DASHBOARD_ADMIN_USERNAME` / `DASHBOARD_ADMIN_PASSWORD` credentials you set in `.env` and run a test call to confirm everything works end-to-end.
+
+## Deploying a Custom Application
+
+You can run your own web application on the same server and have it served at the root path. Deploy it so it listens on **port 6080** of the host — Caddy will automatically proxy `https://DOMAIN_NAME/` to it.
+
+When a custom app is running on port 6080:
+
+| Path | Destination |
+|------|-------------|
+| `/` | Your custom application (port 6080) |
+| `/meet` | OpenVidu Meet |
+
+When no app is listening on port 6080, requests to `/` are redirected to `/meet` automatically, so Meet remains accessible either way.
+
 ## Further Reading
 
 - [TLS / Certificate Configuration](docs/tls-configuration.md)
