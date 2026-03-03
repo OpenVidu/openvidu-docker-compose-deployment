@@ -8,6 +8,18 @@ This is a less opinionated and production ready version of the **OpenVidu Commun
 > [!NOTE]
 > For more advanced setups take a look to [Deployment Types](https://openvidu.io/latest/docs/self-hosting/deployment-types/). These deployments support more dynamic configurations and multinode setups.
 
+## Table of Contents
+
+- [Prerequisites](#prerequisites)
+  - [Port Rules](#port-rules)
+- [Configuration](#configuration)
+- [Usage](#usage)
+  - [Normal mode (bridge networking)](#normal-mode-bridge-networking)
+  - [Host network mode for openvidu](#host-network-mode-for-openvidu)
+- [Verifying the Deployment](#verifying-the-deployment)
+- [Deploying a Custom Application](#deploying-a-custom-application)
+- [Further Reading](#further-reading)
+
 ## Prerequisites
 
 - **CPU**: 4 cores minimum
