@@ -116,6 +116,8 @@ services:
       - LIVEKIT_TURN_DOMAIN=${DOMAIN_NAME:?mandatory}
       - LIVEKIT_WEBHOOK_API_KEY=${LIVEKIT_API_KEY:?mandatory}
       - "LIVEKIT_KEYS=${LIVEKIT_API_KEY:?mandatory}: ${LIVEKIT_API_SECRET:?mandatory}"
+      - LIVEKIT_INGRESS_RTMP_BASE_URL=rtmps://${DOMAIN_NAME:?mandatory}:1935/rtmp
+      - LIVEKIT_INGRESS_WHIP_BASE_URL=https://${DOMAIN_NAME:?mandatory}/whip
     ports:
       - 443:443/udp
       - 7881:7881/tcp
@@ -145,8 +147,6 @@ services:
       - REDIS_PASSWORD=${REDIS_PASSWORD:?mandatory}
       - LIVEKIT_API_KEY=${LIVEKIT_API_KEY:?mandatory}
       - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET:?mandatory}
-      - LIVEKIT_INGRESS_RTMP_BASE_URL=rtmp://${DOMAIN_NAME:?mandatory}/rtmp
-      - LIVEKIT_INGRESS_WHIP_BASE_URL=http://${DOMAIN_NAME:?mandatory}/whip
     volumes:
       - ./ingress.yaml:/etc/ingress.yaml
       - /etc/localtime:/etc/localtime:ro

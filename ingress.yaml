@@ -16,3 +16,4 @@ logging:
 development: false
 rtc_config:
     udp_port: 7885
+    use_external_ip: true
