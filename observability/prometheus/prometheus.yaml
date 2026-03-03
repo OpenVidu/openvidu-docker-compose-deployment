@@ -4,4 +4,4 @@ global:
 scrape_configs:
   - job_name: openvidu
     static_configs:
-      - targets: ["openvidu:6789"]
+      - targets: ["host.docker.internal:6789"]

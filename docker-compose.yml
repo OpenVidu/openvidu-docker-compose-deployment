@@ -111,11 +111,17 @@ services:
       - host.docker.internal:host-gateway
     environment:
       - REDIS_PASSWORD=${REDIS_PASSWORD:?mandatory}
+      - REDIS_HOST=redis:6379
+      - LIVEKIT_OPENVIDU_ANALYTICS_MONGO_URL=mongodb://${MONGO_ADMIN_USERNAME:?mandatory}:${MONGO_ADMIN_PASSWORD:?mandatory}@mongo:27017/?replicaSet=rs0&readPreference=primaryPreferred
       - LIVEKIT_TURN_DOMAIN=${DOMAIN_NAME:?mandatory}
+      - LIVEKIT_WEBHOOK_API_KEY=${LIVEKIT_API_KEY:?mandatory}
       - "LIVEKIT_KEYS=${LIVEKIT_API_KEY:?mandatory}: ${LIVEKIT_API_SECRET:?mandatory}"
     ports:
       - 443:443/udp
       - 7881:7881/tcp
+      - 7880:7880/tcp
+      - 5349:5349/tcp
+      - 6789:6789/tcp
     command: --config /etc/livekit.yaml
     volumes:
       - ./livekit.yaml:/etc/livekit.yaml
@@ -177,11 +183,12 @@ services:
     restart: on-failure
     extra_hosts:
       - host.docker.internal:host-gateway
+    ports:
+      - 9080:9080
     environment:
       - LIVEKIT_URL=wss://${DOMAIN_NAME:?mandatory}/
       - LIVEKIT_API_KEY=${LIVEKIT_API_KEY:?mandatory}
       - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET:?mandatory}
-      - MEET_INITIAL_ADMIN_USER=${MEET_INITIAL_ADMIN_USER:?mandatory}
       - MEET_INITIAL_ADMIN_PASSWORD=${MEET_INITIAL_ADMIN_PASSWORD:?mandatory}
       - MEET_INITIAL_API_KEY=${MEET_INITIAL_API_KEY:-}
       - MEET_S3_ACCESS_KEY=${MINIO_ACCESS_KEY:?mandatory}

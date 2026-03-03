@@ -4,7 +4,8 @@ openvidu:
         enabled: true
         interval: 10s
         expiration: 768h # 32 days
-        mongo_url: mongodb://mongoadmin:mongoadmin@mongo:27017/?replicaSet=rs0&readPreference=primaryPreferred
+        # Setted via environment variable in docker-compose.yml
+        # mongo_url:
 
 # LiveKit configuration
 port: 7880
@@ -16,11 +17,11 @@ rtc:
     port_range_end: 60000
     use_external_ip: true
 redis:
-    address: redis:6379
     username: ""
     db: 0
     use_tls: false
     # Setted via environment variable in docker-compose.yml
+    # address:
     # password:
 turn:
     enabled: true
@@ -30,9 +31,8 @@ turn:
     relay_range_start: 40000
     relay_range_end: 50000
 webhook:
-    api_key: devkey
     urls:
-        - http://openvidu-meet:6080/livekit/webhook
+        - http://host.docker.internal:9080/livekit/webhook
 logging:
     # Logging level for the LiveKit server.
     # Values: debug, info, warn, error.

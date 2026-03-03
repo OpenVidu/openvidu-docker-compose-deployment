@@ -80,7 +80,7 @@ apps:
                   - dial:
                       # TURN with TLS in Firefox does not allow 127.0.0.1
                       # Using Docker service name instead of docker0 interface IP
-                      - openvidu:5349
+                      - host.docker.internal:5349
           - handle:
               - handler: proxy
                 upstreams:
@@ -138,7 +138,7 @@ apps:
                           selection_policy:
                             policy: round_robin
                         upstreams:
-                          - dial: openvidu:7880
+                          - dial: host.docker.internal:7880
                     match:
                       - path:
                           - "/twirp/*"
@@ -259,7 +259,7 @@ apps:
             handle:
               - handler: reverse_proxy
                 upstreams:
-                  - dial: "openvidu-meet:6080"
+                  - dial: "openvidu-meet:9080"
 
           # Default: redirect /* to /meet/
           - match:
