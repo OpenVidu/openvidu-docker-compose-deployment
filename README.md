@@ -131,7 +131,7 @@ Log in with the `DASHBOARD_ADMIN_USERNAME` / `DASHBOARD_ADMIN_PASSWORD` credenti
 
 ## Deploying a Custom Application
 
-You can run your own web application on the same server and have it served at the root path. Deploy it so it listens on **port 6080** of the host — Caddy will automatically proxy `https://DOMAIN_NAME/` to it.
+You can run your own web application on the same server and have it served at the root path. Deploy it so it listens on **port 6080** of the host. Caddy will automatically proxy `https://DOMAIN_NAME/` to it.
 
 When a custom app is running on port 6080:
 
