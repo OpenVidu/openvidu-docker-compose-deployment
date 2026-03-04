@@ -1,14 +1,12 @@
 services:
   caddy-proxy:
-    build:
-      context: ./docker/caddy-proxy
-      dockerfile: Dockerfile
-    image: caddy-layer4
+    image: openvidu/openvidu-caddy:main
     container_name: caddy-proxy
     restart: unless-stopped
     extra_hosts:
       - host.docker.internal:host-gateway
     environment:
+      - NON_OPINIONATED_COMPOSE_MODE=true
       - DOMAIN_NAME=${DOMAIN_NAME:?mandatory}
     volumes:
       - ./caddy.yaml:/etc/caddy/caddy.yaml

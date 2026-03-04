@@ -13,6 +13,7 @@ ARG TARGETARCH
 # which is useful for reproducibility and stability.
 ARG CADDY_VERSION="v2.11.1"
 ARG XCADDY_VERSION="v0.4.5"
+
 # Modules versions
 ARG CADDY_YAML="v0.0.0-20210522210701-64fbdd07cf02"
 ARG CADDY_L4="v0.0.0-20260216070754-eca560d759c9"
@@ -20,7 +21,6 @@ ENV CADDY_VERSION=$CADDY_VERSION \
     XCADDY_VERSION=$XCADDY_VERSION \
     CADDY_YAML=$CADDY_YAML \
     CADDY_L4=$CADDY_L4
-
 RUN echo building caddy $CADDY_VERSION for "$TARGETOS"
 # ---------------------
 
@@ -34,32 +34,13 @@ RUN GOOS=$TARGETOS GOARCH=$TARGETARCH xcaddy build \
 
 FROM alpine
 
-RUN apk add --no-cache \
-	ca-certificates \
-	curl \
-	libcap \
-	mailcap \
-    tzdata
-
-RUN set -eux; \
-    mkdir -p \
-        /config/caddy \
-        /data/caddy \
-        /etc/caddy \
-        /usr/share/caddy
-
-# See https://caddyserver.com/docs/conventions#file-locations for details
-ENV XDG_CONFIG_HOME=/config
-ENV XDG_DATA_HOME=/data
+# Add support for timezone configuration
+RUN apk add --no-cache tzdata
 
 COPY --from=builder /workspace/caddy /bin/caddy
+
+# Copy entrypoint script
 COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
 
-EXPOSE 80
-EXPOSE 443
-EXPOSE 443/udp
-
-WORKDIR /srv
-
+# Run the binary.
 ENTRYPOINT ["/entrypoint.sh"]
