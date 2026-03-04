@@ -1,0 +1,21 @@
+services:
+    agent-speech-to-text:
+      image: docker.io/openvidu/agent-speech-to-text:main
+      container_name: agent-speech-to-text
+      restart: unless-stopped
+      extra_hosts:
+        - host.docker.internal:host-gateway
+      environment:
+        - REDIS_ADDRESS=redis:6379
+        - REDIS_PASSWORD=${REDIS_PASSWORD:?mandatory}
+        - AGENT_CONFIG_FILE=/config/agent-speech-processing.yaml
+        - LIVEKIT_URL=ws://host.docker.internal:7880
+        - LIVEKIT_API_KEY=${LIVEKIT_API_KEY:?mandatory}
+        - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET:?mandatory}
+      volumes:
+        - ./agent-speech-processing.yaml:/config/agent-speech-processing.yaml
+        - /etc/localtime:/etc/localtime:ro
+      networks:
+        - openvidu-network
+      labels:
+        - logging=true

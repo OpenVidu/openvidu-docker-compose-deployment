@@ -110,7 +110,15 @@ docker compose up -d
 Runs the `openvidu` container with `network_mode: host`, which can improve WebRTC performance by removing NAT layers for the media server.
 
 ```bash
-docker compose -f docker-compose.yml -f docker-compose.host.yaml up -d
+docker compose -f docker-compose.yaml -f docker-compose.host.yaml up -d
+```
+
+### Launching with Agents
+
+OpenVidu Agents are optional components that provide additional processing capabilities (e.g. speech-to-text) and can be enabled or disabled independently of the main OpenVidu services. You simply need to include the `docker-compose.agents.yaml` file when launching the deployment to run the agents:
+
+```bash
+docker compose -f docker-compose.yaml -f docker-compose.agents.yaml up -d
 ```
 
 ## Verifying the Deployment
