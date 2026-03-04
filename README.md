@@ -16,6 +16,7 @@ This is a less opinionated and production ready version of the **OpenVidu Commun
 - [Usage](#usage)
   - [Normal mode (bridge networking)](#normal-mode-bridge-networking)
   - [Host network mode for openvidu](#host-network-mode-for-openvidu)
+  - [Launching with Agents](#launching-with-agents)
 - [Verifying the Deployment](#verifying-the-deployment)
 - [Deploying a Custom Application](#deploying-a-custom-application)
 - [Further Reading](#further-reading)
