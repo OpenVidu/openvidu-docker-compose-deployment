@@ -80,6 +80,7 @@ services:
       - MONGODB_REPLICA_SET_NAME=rs0
       - MONGODB_REPLICA_SET_KEY=devreplicasetkey
       - MONGODB_ADVERTISED_HOSTNAME=host.docker.internal
+      - MONGODB_NET_BINDIP=0.0.0.0
     volumes:
       - mongo-data:/bitnami/mongodb
       - /etc/localtime:/etc/localtime:ro
