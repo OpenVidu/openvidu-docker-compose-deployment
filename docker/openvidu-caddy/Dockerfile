@@ -41,6 +41,7 @@ COPY --from=builder /workspace/caddy /bin/caddy
 
 # Copy entrypoint script
 COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 # Run the binary.
 ENTRYPOINT ["/entrypoint.sh"]
