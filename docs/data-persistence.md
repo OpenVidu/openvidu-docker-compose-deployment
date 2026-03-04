@@ -4,8 +4,8 @@ All stateful data is stored in standard Docker named volumes:
 
 | Volume | Service | Contents |
 |--------|---------|----------|
-| `caddy-data` | caddy-proxy | TLS certificates and ACME account data |
-| `caddy-config` | caddy-proxy | Caddy runtime configuration |
+| `caddy-data` | openvidu-caddy | TLS certificates and ACME account data |
+| `caddy-config` | openvidu-caddy | Caddy runtime configuration |
 | `redis-data` | redis | OpenVidu runtime state |
 | `minio-data` | minio | **Critical** — recordings produced by egress and application data |
 | `minio-certs` | minio | MinIO TLS certificates |

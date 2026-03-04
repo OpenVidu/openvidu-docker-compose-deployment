@@ -1,7 +1,7 @@
 services:
-  caddy-proxy:
+  openvidu-caddy:
     image: openvidu/openvidu-caddy:main
-    container_name: caddy-proxy
+    container_name: caddy
     restart: unless-stopped
     extra_hosts:
       - host.docker.internal:host-gateway

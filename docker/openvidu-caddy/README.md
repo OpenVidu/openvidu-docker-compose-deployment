@@ -7,6 +7,7 @@ This directory contains the Dockerfile to build a custom Caddy proxy image for O
 This Caddy image is built with additional modules required by OpenVidu:
 
 - **caddy-l4**: Layer 4 (TCP/UDP) proxy support
+- **caddy-yaml**: YAML configuration support
 
 ## Building the Image
 
@@ -23,8 +24,8 @@ docker compose up -d
 If you want to build the image manually:
 
 ```bash
-cd docker/caddy-proxy
-docker build -t caddy-layer4 .
+cd docker/openvidu-caddy
+docker build -t openvidu-caddy .
 ```
 
 ### Multi-platform Build
@@ -32,31 +33,18 @@ docker build -t caddy-layer4 .
 To build for multiple platforms (e.g., for both AMD64 and ARM64):
 
 ```bash
-cd docker/caddy-proxy
-docker buildx build --platform linux/amd64,linux/arm64 -t caddy-layer4 .
+cd docker/openvidu-caddy
+docker buildx build --platform linux/amd64,linux/arm64 -t openvidu-caddy .
 ```
 
 ## Configuration
 
-The Caddy proxy is configured via the `Caddyfile` in the project root directory. It acts as a reverse proxy for:
+The Caddy proxy is configured via `caddy.yaml` in the project root directory. It acts as a reverse proxy for:
 
 - LiveKit WebSocket server (port 7880)
 - OpenVidu Dashboard (path: /dashboard)
 - OpenVidu Meet (path: /meet)
 - MinIO Console (path: /minio-console)
-
-## Versions
-
-The Dockerfile pins specific versions for reproducibility:
-
-- Caddy: v2.11.1
-- xcaddy: v0.4.5
-- caddy-l4: v0.0.0-20260216070754-eca560d759c9
-
-## Base Image
-
-- **Builder**: golang:1.26.0-alpine
-- **Runtime**: alpine (latest)
 
 ## Notes
 
