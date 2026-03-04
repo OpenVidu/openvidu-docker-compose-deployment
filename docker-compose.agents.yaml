@@ -1,6 +1,8 @@
 services:
     agent-speech-to-text:
-      image: docker.io/openvidu/agent-speech-to-text:main
+      # For cloud providers, use the following image instead:
+      # image: docker.io/openvidu/agent-speech-processing-cloud:main
+      image: docker.io/openvidu/agent-speech-processing-vosk:main
       container_name: agent-speech-to-text
       restart: unless-stopped
       extra_hosts:
