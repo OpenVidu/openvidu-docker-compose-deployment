@@ -1,6 +1,6 @@
 services:
   openvidu-caddy:
-    image: openvidu/openvidu-caddy:3.6.0
+    image: openvidu/openvidu-caddy:main
     container_name: caddy
     restart: unless-stopped
     extra_hosts:
@@ -90,7 +90,7 @@ services:
       - logging=true
 
   dashboard:
-    image: docker.io/openvidu/openvidu-dashboard:3.6.0
+    image: docker.io/openvidu/openvidu-dashboard:main
     container_name: dashboard
     restart: unless-stopped
     extra_hosts:
@@ -108,7 +108,7 @@ services:
       - logging=true
 
   openvidu:
-    image: docker.io/openvidu/openvidu-server:3.6.0
+    image: docker.io/openvidu/openvidu-server:main
     restart: unless-stopped
     container_name: openvidu
     network_mode: host
@@ -131,7 +131,7 @@ services:
       - logging=true
 
   ingress:
-    image: docker.io/openvidu/ingress:3.6.0
+    image: docker.io/openvidu/ingress:main
     container_name: ingress
     restart: unless-stopped
     extra_hosts:
@@ -153,7 +153,7 @@ services:
       - logging=true
 
   egress:
-    image: docker.io/openvidu/egress:3.6.0
+    image: docker.io/openvidu/egress:main
     restart: unless-stopped
     container_name: egress
     extra_hosts:
@@ -175,7 +175,7 @@ services:
       - logging=true
 
   openvidu-meet:
-    image: docker.io/openvidu/openvidu-meet:3.6.0
+    image: docker.io/openvidu/openvidu-meet:main
     container_name: openvidu-meet
     restart: on-failure
     extra_hosts:
