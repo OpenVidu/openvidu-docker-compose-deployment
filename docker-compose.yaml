@@ -29,6 +29,8 @@ services:
     image: docker.io/redis:8.6.1-alpine
     container_name: redis
     restart: unless-stopped
+    ports:
+      - "6379:6379"
     extra_hosts:
       - host.docker.internal:host-gateway
     command: redis-server --requirepass ${REDIS_PASSWORD:?mandatory}
@@ -66,6 +68,8 @@ services:
     image: docker.io/openvidu/mongodb:8.0.19-r1
     container_name: mongo
     restart: unless-stopped
+    ports:
+      - "27017:27017"
     extra_hosts:
       - host.docker.internal:host-gateway
     environment:
@@ -75,6 +79,8 @@ services:
       - MONGODB_REPLICA_SET_MODE=primary
       - MONGODB_REPLICA_SET_NAME=rs0
       - MONGODB_REPLICA_SET_KEY=devreplicasetkey
+      - MONGODB_ADVERTISED_HOSTNAME=host.docker.internal
+      - MONGODB_NET_BINDIP=0.0.0.0
     volumes:
       - mongo-data:/bitnami/mongodb
       - /etc/localtime:/etc/localtime:ro
@@ -105,29 +111,22 @@ services:
     image: docker.io/openvidu/openvidu-server:3.5.0
     restart: unless-stopped
     container_name: openvidu
+    network_mode: host
     extra_hosts:
       - host.docker.internal:host-gateway
     environment:
       - REDIS_PASSWORD=${REDIS_PASSWORD:?mandatory}
-      - REDIS_HOST=redis:6379
-      - LIVEKIT_OPENVIDU_ANALYTICS_MONGO_URL=mongodb://${MONGO_ADMIN_USERNAME:?mandatory}:${MONGO_ADMIN_PASSWORD:?mandatory}@mongo:27017/?replicaSet=rs0&readPreference=primaryPreferred
+      - REDIS_HOST=host.docker.internal:6379
+      - LIVEKIT_OPENVIDU_ANALYTICS_MONGO_URL=mongodb://${MONGO_ADMIN_USERNAME:?mandatory}:${MONGO_ADMIN_PASSWORD:?mandatory}@host.docker.internal:27017/?replicaSet=rs0&readPreference=primaryPreferred
       - LIVEKIT_TURN_DOMAIN=${DOMAIN_NAME:?mandatory}
       - LIVEKIT_WEBHOOK_API_KEY=${LIVEKIT_API_KEY:?mandatory}
       - "LIVEKIT_KEYS=${LIVEKIT_API_KEY:?mandatory}: ${LIVEKIT_API_SECRET:?mandatory}"
       - LIVEKIT_INGRESS_RTMP_BASE_URL=rtmps://${DOMAIN_NAME:?mandatory}:1935/rtmp
       - LIVEKIT_INGRESS_WHIP_BASE_URL=https://${DOMAIN_NAME:?mandatory}/whip
-    ports:
-      - 443:443/udp
-      - 7881:7881/tcp
-      - 7880:7880/tcp
-      - 5349:5349/tcp
-      - 6789:6789/tcp
     command: --config /etc/livekit.yaml
     volumes:
       - ./livekit.yaml:/etc/livekit.yaml
       - /etc/localtime:/etc/localtime:ro
-    networks:
-      - openvidu-network
     labels:
       - logging=true
 
@@ -187,6 +186,7 @@ services:
       - LIVEKIT_URL=wss://${DOMAIN_NAME:?mandatory}/
       - LIVEKIT_API_KEY=${LIVEKIT_API_KEY:?mandatory}
       - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET:?mandatory}
+      - MEET_INITIAL_ADMIN_USER=admin
       - MEET_INITIAL_ADMIN_PASSWORD=${MEET_INITIAL_ADMIN_PASSWORD:?mandatory}
       - MEET_INITIAL_API_KEY=${MEET_INITIAL_API_KEY:-}
       - MEET_S3_ACCESS_KEY=${MINIO_ACCESS_KEY:?mandatory}
