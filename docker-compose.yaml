@@ -75,10 +75,9 @@ services:
     environment:
       - MONGODB_ROOT_USER=${MONGO_ADMIN_USERNAME:?mandatory}
       - MONGODB_ROOT_PASSWORD=${MONGO_ADMIN_PASSWORD:?mandatory}
-      - MONGODB_ADVERTISED_HOSTNAME=mongo
       - MONGODB_REPLICA_SET_MODE=primary
       - MONGODB_REPLICA_SET_NAME=rs0
-      - MONGODB_REPLICA_SET_KEY=devreplicasetkey
+      - MONGODB_REPLICA_SET_KEY=${MONGO_ADMIN_PASSWORD:?mandatory}
       - MONGODB_ADVERTISED_HOSTNAME=host.docker.internal
       - MONGODB_NET_BINDIP=0.0.0.0
     volumes:
