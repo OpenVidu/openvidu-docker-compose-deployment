@@ -86,7 +86,7 @@ Outbound traffic is typically unrestricted and requires no special configuration
 Clone the repository and enter the directory:
 
 ```bash
-git clone https://github.com/OpenVidu/openvidu-docker-compose-deployment.git --branch development
+git clone https://github.com/OpenVidu/openvidu-docker-compose-deployment.git --branch 3.6.0
 cd openvidu-docker-compose-deployment
 ```
 
