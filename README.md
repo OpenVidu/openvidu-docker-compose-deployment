@@ -39,7 +39,7 @@ Features included in OpenVidu CE single node deployment with installer but not i
 
 ## OpenVidu CE single node deployment with plain Docker Compose vs OpenVidu Local Deployment
 
-The recommended way to develop with OpenVidu in a local environment is using the [OpenVidu Local Deployment](https://openvidu.io/latest/docs/local-deployment/), which is designed for development and testing purposes. It provides a simplified setup and it is easy to test in the local network.
+The recommended way to develop with OpenVidu in a local environment is using the [OpenVidu Local Deployment](https://openvidu.io/latest/docs/self-hosting/local/), which is designed for development and testing purposes. It provides a simplified setup and it is easy to test in the local network.
 
 The plain Docker Compose deployment is more suitable for production environments or for users who want to deploy a production setup. It also includes services like Grafana for monitoring, which are not included in the local deployment.
 
