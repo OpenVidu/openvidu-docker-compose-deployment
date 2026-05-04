@@ -30,6 +30,8 @@ turn:
     external_tls: true
     relay_range_start: 40000
     relay_range_end: 50000
+    # Lifetime of issued TURN credentials. Default 24h.
+    credential_ttl: 24h
 webhook:
     urls:
         - http://host.docker.internal:9080/livekit/webhook
