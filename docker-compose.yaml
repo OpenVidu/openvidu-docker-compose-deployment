@@ -223,7 +223,7 @@ services:
       - openvidu-network
 
   loki:
-    image: grafana/loki:3.5.12
+    image: openvidu/grafana-loki:3.5.12
     container_name: loki
     restart: on-failure
     extra_hosts:
