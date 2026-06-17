@@ -11,12 +11,12 @@ ARG TARGETARCH
 #
 # The following declared versions allows to build caddy with fixed versions
 # which is useful for reproducibility and stability.
-ARG CADDY_VERSION="v2.11.2"
-ARG XCADDY_VERSION="v0.4.5"
+ARG CADDY_VERSION="v2.11.4"
+ARG XCADDY_VERSION="v0.4.6"
 
 # Modules versions
 ARG CADDY_YAML="v0.0.0-20210522210701-64fbdd07cf02"
-ARG CADDY_L4="v0.1.0"
+ARG CADDY_L4="v0.1.1"
 ENV CADDY_VERSION=$CADDY_VERSION \
     XCADDY_VERSION=$XCADDY_VERSION \
     CADDY_YAML=$CADDY_YAML \
