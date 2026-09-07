@@ -26,7 +26,7 @@ services:
       - logging=true
 
   redis:
-    image: docker.io/redis:8.6.4-alpine
+    image: docker.io/redis:8.10.1-alpine
     container_name: redis
     restart: unless-stopped
     ports:
@@ -43,7 +43,7 @@ services:
       - logging=true
 
   minio:
-    image: docker.io/openvidu/minio:RELEASE.2026-06-04T00-54-11Z-r0
+    image: docker.io/openvidu/minio:RELEASE.2026-07-17T12-07-51Z-r0
     container_name: minio
     restart: unless-stopped
     extra_hosts:
@@ -65,7 +65,7 @@ services:
       - logging=true
 
   mongo:
-    image: docker.io/openvidu/mongodb:8.0.26-r0
+    image: docker.io/openvidu/mongodb:8.0.29-r0
     container_name: mongo
     restart: unless-stopped
     ports:
@@ -205,7 +205,7 @@ services:
 
   # Observability stack
   prometheus:
-    image: prom/prometheus:v3.12.0
+    image: prom/prometheus:v3.14.0
     container_name: prometheus
     restart: on-failure
     extra_hosts:
@@ -223,7 +223,7 @@ services:
       - openvidu-network
 
   loki:
-    image: openvidu/grafana-loki:3.7.2-r0
+    image: openvidu/grafana-loki:3.7.7-r0
     container_name: loki
     restart: on-failure
     extra_hosts:
@@ -254,7 +254,7 @@ services:
       - openvidu-network
 
   grafana:
-    image: grafana/grafana:12.4.4
+    image: grafana/grafana:12.4.10
     container_name: grafana
     restart: on-failure
     extra_hosts:
