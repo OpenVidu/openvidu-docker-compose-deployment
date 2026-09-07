@@ -1,4 +1,4 @@
-FROM golang:1.26.2-alpine AS builder
+FROM golang:1.27.1-alpine AS builder
 
 ARG TARGETOS
 ARG TARGETPLATFORM
@@ -12,7 +12,7 @@ ARG TARGETARCH
 # The following declared versions allows to build caddy with fixed versions
 # which is useful for reproducibility and stability.
 ARG CADDY_VERSION="v2.11.4"
-ARG XCADDY_VERSION="v0.4.6"
+ARG XCADDY_VERSION="v0.4.7"
 
 # Modules versions
 ARG CADDY_YAML="v0.0.0-20210522210701-64fbdd07cf02"
