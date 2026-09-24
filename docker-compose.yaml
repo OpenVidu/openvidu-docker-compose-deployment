@@ -54,6 +54,8 @@ services:
       - MINIO_DEFAULT_BUCKETS=openvidu-appdata
       - MINIO_CONSOLE_SUBPATH=/minio-console
       - MINIO_BROWSER=on
+      # Disable the update check against dl.min.io at startup
+      - MINIO_UPDATE=off
       - MINIO_BROWSER_REDIRECT_URL=http://localhost:7880/minio-console
     volumes:
       - minio-data:/bitnami/minio/data
@@ -65,7 +67,7 @@ services:
       - logging=true
 
   mongo:
-    image: docker.io/openvidu/mongodb:8.0.29-r0
+    image: docker.io/openvidu/mongodb:8.0.29-r1
     container_name: mongo
     restart: unless-stopped
     ports:
@@ -268,6 +270,20 @@ services:
       - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/etc/grafana/provisioning/dashboards/openvidu_metrics.json
       - GF_SERVER_ROOT_URL=https://${DOMAIN_NAME:?mandatory}/grafana/
       - GF_SERVER_SERVE_FROM_SUB_PATH=true
+      # Disable every call to Grafana Labs and other third parties: usage stats,
+      # version and plugin update checks, background plugin installation, plugin
+      # signing key download, news feed, Gravatar avatars, feedback links,
+      # external snapshots and the cloud migration assistant.
+      - GF_ANALYTICS_REPORTING_ENABLED=false
+      - GF_ANALYTICS_CHECK_FOR_UPDATES=false
+      - GF_ANALYTICS_CHECK_FOR_PLUGIN_UPDATES=false
+      - GF_ANALYTICS_FEEDBACK_LINKS_ENABLED=false
+      - GF_PLUGINS_PREINSTALL_DISABLED=true
+      - GF_PLUGINS_PUBLIC_KEY_RETRIEVAL_DISABLED=true
+      - GF_NEWS_NEWS_FEED_ENABLED=false
+      - GF_SECURITY_DISABLE_GRAVATAR=true
+      - GF_SNAPSHOTS_EXTERNAL_ENABLED=false
+      - GF_CLOUD_MIGRATION_ENABLED=false
     volumes:
       - grafana-data:/var/lib/grafana
       - ./observability/grafana/provisioning:/etc/grafana/provisioning

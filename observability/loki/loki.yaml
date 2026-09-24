@@ -1,5 +1,9 @@
 auth_enabled: false
 
+# Do not send usage reports to Grafana Labs
+analytics:
+  reporting_enabled: false
+
 server:
   http_listen_port: 3100
   grpc_listen_port: 9096
