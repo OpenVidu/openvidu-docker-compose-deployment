@@ -230,7 +230,7 @@ services:
     restart: on-failure
     extra_hosts:
       - host.docker.internal:host-gateway
-    command: -config.file=/config/loki.yaml
+    command: -config.file=/config/loki.yaml -reporting.enabled=false
     volumes:
       - ./observability/loki/loki.yaml:/config/loki.yaml:ro
       - loki-data:/loki
