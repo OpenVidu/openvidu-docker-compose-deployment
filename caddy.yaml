@@ -45,16 +45,36 @@ apps:
         listen:
           - ":443"
         routes:
-          # TLS handling. It resends to the same port to handle TURN and HTTP traffic
+          # TLS handling. TURN and HTTP traffic share the port: once TLS is
+          # terminated, STUN messages go to the TURN server and the rest to HTTP
           - handle:
               - handler: tls
                 connection_policies:
                   - alpn:
                       - http/1.1
-              - handler: proxy
-                upstreams:
-                  - dial:
-                      - 127.0.0.1:5656
+              - handler: subroute
+                routes:
+                  - match:
+                      - regexp:
+                          # STUN header as hex, since its bytes are not valid UTF-8: message
+                          # type with the first two bits zero, length multiple of 4 and magic
+                          # cookie 0x2112A442. Caddy replaces {...} placeholders in the
+                          # pattern, so it uses no {n} quantifiers
+                          count: 8
+                          hex: true
+                          pattern: "^[0-3]......[048C]2112A442$"
+                    handle:
+                      - handler: proxy
+                        upstreams:
+                          - dial:
+                              # TURN with TLS in Firefox does not allow 127.0.0.1
+                              # Using Docker service name instead of docker0 interface IP
+                              - host.docker.internal:5349
+                  - handle:
+                      - handler: proxy
+                        upstreams:
+                          - dial:
+                              - 127.0.0.1:7880
 
       # RTMP Ingress
       rtmp:
@@ -67,28 +87,6 @@ apps:
                 upstreams:
                   - dial:
                       - ingress:1935
-
-      # TCP demuxer for TURN and HTTP traffic
-      tcp-demux:
-        listen:
-          - ":5656"
-        routes:
-          - match:
-              - regexp:
-                  count: 6
-                  pattern: "^[\x00-\x3F][\x00-\xFF][\x00-\xFF][\x00-\xFF]\x21\x12$"
-            handle:
-              - handler: proxy
-                upstreams:
-                  - dial:
-                      # TURN with TLS in Firefox does not allow 127.0.0.1
-                      # Using Docker service name instead of docker0 interface IP
-                      - host.docker.internal:5349
-          - handle:
-              - handler: proxy
-                upstreams:
-                  - dial:
-                      - 127.0.0.1:7880
 
   http:
     http_port: 80
