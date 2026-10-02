@@ -65,6 +65,7 @@ apps:
                           pattern: "^[0-3]......[048C]2112A442$"
                     handle:
                       - handler: proxy
+                        half_close_timeout: 30s
                         upstreams:
                           - dial:
                               # TURN with TLS in Firefox does not allow 127.0.0.1
@@ -72,6 +73,7 @@ apps:
                               - host.docker.internal:5349
                   - handle:
                       - handler: proxy
+                        half_close_timeout: 30s
                         upstreams:
                           - dial:
                               - 127.0.0.1:7880
@@ -84,6 +86,7 @@ apps:
           - handle:
               - handler: tls
               - handler: proxy
+                half_close_timeout: 30s
                 upstreams:
                   - dial:
                       - ingress:1935
