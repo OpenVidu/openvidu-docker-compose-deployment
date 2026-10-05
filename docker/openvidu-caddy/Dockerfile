@@ -18,8 +18,9 @@ ARG XCADDY_VERSION="v0.4.7"
 ARG CADDY_YAML="v0.0.0-20210522210701-64fbdd07cf02"
 # Fork of mholt/caddy-l4 (v0.1.2) that sends a TCP FIN after close_notify when
 # the proxy half-closes a TLS connection, and adds the proxy half_close_timeout
-# option. The version is the pseudo-version of cruizba/caddy-l4 main.
-ARG CADDY_L4="v0.0.0-20261002162644-bcbebe8cb2b4"
+# and tls handshake_timeout options. The version is the pseudo-version of
+# cruizba/caddy-l4 main.
+ARG CADDY_L4="v0.0.0-20261005173914-ab8b00b1ad90"
 ENV CADDY_VERSION=$CADDY_VERSION \
     XCADDY_VERSION=$XCADDY_VERSION \
     CADDY_YAML=$CADDY_YAML \
