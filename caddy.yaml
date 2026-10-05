@@ -49,11 +49,12 @@ apps:
           # terminated, STUN messages go to the TURN server and the rest to HTTP
           - handle:
               - handler: tls
-                handshake_timeout: 10s
+                handshake_timeout: 60s
                 connection_policies:
                   - alpn:
                       - http/1.1
               - handler: subroute
+                matching_timeout: 10s
                 routes:
                   - match:
                       - regexp:
@@ -86,7 +87,7 @@ apps:
         routes:
           - handle:
               - handler: tls
-                handshake_timeout: 10s
+                handshake_timeout: 60s
               - handler: proxy
                 half_close_timeout: 30s
                 upstreams:
