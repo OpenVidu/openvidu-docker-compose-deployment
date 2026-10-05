@@ -20,7 +20,7 @@ ARG CADDY_YAML="v0.0.0-20210522210701-64fbdd07cf02"
 # the proxy half-closes a TLS connection, and adds the proxy half_close_timeout
 # and tls handshake_timeout options. The version is the pseudo-version of
 # cruizba/caddy-l4 main.
-ARG CADDY_L4="v0.0.0-20261005173914-ab8b00b1ad90"
+ARG CADDY_L4="v0.0.0-20261005191601-680d23b981d4"
 ENV CADDY_VERSION=$CADDY_VERSION \
     XCADDY_VERSION=$XCADDY_VERSION \
     CADDY_YAML=$CADDY_YAML \
