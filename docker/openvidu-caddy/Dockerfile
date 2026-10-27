@@ -11,7 +11,7 @@ ARG TARGETARCH
 #
 # The following declared versions allows to build caddy with fixed versions
 # which is useful for reproducibility and stability.
-ARG CADDY_VERSION="v2.11.4"
+ARG CADDY_VERSION="v2.11.7"
 ARG XCADDY_VERSION="v0.4.7"
 
 # Modules versions
