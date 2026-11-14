@@ -43,7 +43,7 @@ services:
       - logging=true
 
   minio:
-    image: docker.io/openvidu/minio:RELEASE.2026-11-09T00-10-40Z-r0
+    image: docker.io/openvidu/minio:RELEASE.2026-11-09T00-10-40Z-r1
     container_name: minio
     restart: unless-stopped
     extra_hosts:
@@ -256,7 +256,7 @@ services:
       - openvidu-network
 
   grafana:
-    image: grafana/grafana:12.4.14
+    image: grafana/grafana:12.4.15
     container_name: grafana
     restart: on-failure
     extra_hosts:
