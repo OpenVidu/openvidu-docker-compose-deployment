@@ -30,6 +30,8 @@ turn:
     external_tls: true
     relay_range_start: 40000
     relay_range_end: 50000
+    # Close TURN TCP/TLS connections idle in both directions for this many seconds
+    tcp_connection_idle_timeout_seconds: 60
 webhook:
     urls:
         - http://host.docker.internal:9080/livekit/webhook
