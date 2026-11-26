@@ -43,7 +43,7 @@ services:
       - logging=true
 
   minio:
-    image: docker.io/openvidu/minio:RELEASE.2026-11-16T00-11-40Z-r0
+    image: docker.io/openvidu/minio:RELEASE.2026-11-16T00-11-40Z-r1
     container_name: minio
     restart: unless-stopped
     extra_hosts:
@@ -67,7 +67,7 @@ services:
       - logging=true
 
   mongo:
-    image: docker.io/openvidu/mongodb:8.0.38-r0
+    image: docker.io/openvidu/mongodb:8.0.38-r1
     container_name: mongo
     restart: unless-stopped
     ports:
